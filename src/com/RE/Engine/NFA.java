@@ -112,6 +112,7 @@ public class NFA {
             nfa.get(i).state = String.valueOf(i);
     }
 
+    //连接两个NFA，即串联
     public void connect(NFA n1){
         if(n1 == null)
             return;
@@ -127,6 +128,61 @@ public class NFA {
             this.addnode(x);
         this.statesorted();
 
+    }
+
+    //合并两个NFA，即并联
+    public void combine(NFA n1){
+        if(n1==null)
+            return;
+        if(nfa==null){
+            nfa = n1.nfa;
+            return;
+        }
+        NFA n0 = new NFA();
+        NFAnode s = this.getstart();
+        NFAnode s1 = n1.getstart();
+        NFAnode e = this.getend();
+        NFAnode e1 = n1.getend();
+        s.Start = false;
+        s1.Start = false ;
+        e.End = false ;
+        e1.End = false ;
+        n0.addnode("S");
+        n0.addStart("S");
+        n0.addnode("E");
+        n0.addEnd("E");
+        n0.getstart().addEdge('\0',s);
+        n0.getstart().addEdge('\0',s1);
+        e.addEdge('\0',n0.getend());
+        e1.addEdge('\0',n0.getend());
+        for(NFAnode x:nfa)
+            n0.addnode(x);
+        for(NFAnode x:n1.nfa)
+            n0.addnode(x);
+        n0.statesorted();
+        this.nfa = n0.nfa;
+    }
+
+    //创建实例
+    public static NFA ins(Character c)
+    {
+        NFA n = new NFA();
+        n.addnode("S");
+        n.addStart("S");
+        n.addnode("E");
+        n.addEnd("E");
+        n.addedge("S", c, "E");
+        n.statesorted();
+        return n;
+    }
+
+
+    public static void main(String[] args) {
+        char c = (char)2;
+        NFA n1 = NFA.ins(c);
+        NFAnode node = n1.getstart();
+
+        System.out.println(node.hasPath(c));
     }
 
 
