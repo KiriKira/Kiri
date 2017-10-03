@@ -176,6 +176,27 @@ public class NFA {
         return n;
     }
 
+    //添加闭包
+    public void closure(){
+        NFA n = new NFA();
+        n.addnode("S");
+        n.addnode("E");
+        n.addStart("S");
+        n.addEnd("E");
+        NFAnode s0 = this.getstart();
+        NFAnode e0 = this.getend();
+        s0.Start = false;
+        s0.End = false;
+        n.getstart().addEdge('\0',s0);
+        n.getstart().addEdge('\0',n.getend());
+        e0.addEdge('\0',s0);
+        e0.addEdge('\0',n.getend());
+        for(NFAnode x:this.nfa)
+            n.addnode(x);
+        n.statesorted();
+        this.nfa = n.nfa;
+    }
+
 
     public static void main(String[] args) {
         char c = (char)2;
