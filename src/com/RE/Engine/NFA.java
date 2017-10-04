@@ -44,7 +44,7 @@ public class NFA {
             }
         }
     }
-    public void NFA(){
+    public NFA(){
         nfa = new ArrayList<>();
     }
 
@@ -64,7 +64,10 @@ public class NFA {
 
     private void addStart(String s){
         if(nfa!=null)
-            getnode(s).Start = true;
+            if(getnode(s)!=null)
+                getnode(s).Start = true;
+            else
+                System.out.println("不存在这样的节点");
     }
 
     private void addEnd(String s){
@@ -73,13 +76,15 @@ public class NFA {
     }
 
     private void addnode(NFAnode node){
-        if(nfa!=null)
+        if(nfa!=null) {
             nfa.add(node);
+        }
     }
 
-    private void addnode(String s){
-        if(nfa!=null)
-            nfa.add(new NFAnode(s));
+    private NFAnode addnode(String s){
+            NFAnode n1 = new NFAnode(s);
+            nfa.add(n1);
+            return n1;
     }
 
     private void addedge(String src,Character c,String des){
@@ -98,10 +103,13 @@ public class NFA {
     }
 
     public NFAnode getend(){
-        if(nfa != null)
-            for(NFAnode x:nfa)
-                if(x.End)
-                    return x;
+        if(nfa == null){
+            System.out.println("nfa is null!");
+            return null;
+        }
+        for(NFAnode x:nfa)
+            if(x.End == true)
+                return x;
         return null;
 
     }
@@ -120,7 +128,7 @@ public class NFA {
             nfa = n1.nfa;
             return;
         }
-        NFAnode n = this.getend();
+        NFAnode n = getend();
         n.End = false;
         n1.getstart().Start = false;
         n.addEdge('\0',n1.getstart());
@@ -167,10 +175,10 @@ public class NFA {
     public static NFA ins(Character c)
     {
         NFA n = new NFA();
-        n.addnode("S");
-        n.addStart("S");
-        n.addnode("E");
-        n.addEnd("E");
+        NFAnode n1 = n.addnode("S");
+        n1.Start = true;
+        NFAnode n2 = n.addnode("E");
+        n2.End = true;
         n.addedge("S", c, "E");
         n.statesorted();
         return n;

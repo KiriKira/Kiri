@@ -87,7 +87,7 @@ public class DFA {
             NFAnode s0 = nfa.getstart();
             HashSet<HashSet<NFA.NFAnode>> result = new HashSet<>(); //用来暂时存放节点，用以在后面检查是否有重复闭包
             Stack<HashSet<NFA.NFAnode>> dStates = new Stack<>(); //操作栈
-            HashSet<NFAnode> start = Transit.calClosure(s0);
+            HashSet<NFA.NFAnode> start = Transit.calClosure(s0);
             dStates.push(start);
             result.add(start);
             dfa1.addNode(start);
@@ -110,8 +110,10 @@ public class DFA {
         }
 
         public boolean match(String s){
-            if(dfa ==null)
+            if(dfa ==null) {
+                System.out.println("dfa==null!!");
                 return false;
+            }
             DFAnode currentNode = null;
             for(DFAnode node:dfa)
                 if(node.start == true)
