@@ -189,5 +189,13 @@ public class Re {
         return this.dfa.match(s);
     }
 
+    public boolean contains(String s){
+        return dfa.contain(s);
+    }
+
+    public int search(String s){
+        return dfa.search(s);
+    }
+
 
 }
