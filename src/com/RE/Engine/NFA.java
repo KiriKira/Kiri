@@ -2,7 +2,7 @@ package com.RE.Engine;
 
 import java.util.ArrayList;
 
-public class NFA {
+public class NFA  {
 
     private ArrayList<NFAnode> nfa;
 
@@ -52,6 +52,22 @@ public class NFA {
         return nfa.size();
     }
 
+    public void copy(NFA n1){
+        for(NFAnode x:n1.nfa){
+            NFAnode node = new NFAnode(x.state);
+            nfa.add(node);
+        }
+        for(NFAnode x:n1.nfa){
+            for(int i=0;i<x.edge.size();i++){
+                this.addedge(x.state ,x.edge.get(i) ,x.desnodes.get(i).state);
+            }
+            if(x.Start==true)
+                this.getnode(x.state).Start = true;
+            if(x.End == true)
+                this.getnode(x.state).End = true;
+        }
+    }
+
     public NFAnode getnode(String s){
         if(nfa == null)
             return null;
@@ -61,6 +77,7 @@ public class NFA {
         }
         return null;
     }
+
 
     private void addStart(String s){
         if(nfa!=null)
@@ -185,6 +202,58 @@ public class NFA {
         return n;
     }
 
+    //创建用于.号的实例，匹配任意字符
+    public static NFA insAny(){
+        NFA n = new NFA();
+        NFAnode n1 = n.addnode("S");
+        NFAnode n2 = n.addnode("E");
+        n1.Start = true;
+        n2.End = true;
+        for(Character c:Transit.alphabet2){
+            n1.addEdge(c,n2);
+        }
+        n.statesorted();
+        return n;
+    }
+
+    //为\s准备的
+    public static NFA insFors(){
+        NFA n = new NFA();
+        NFAnode n1 = n.addnode("S");
+        NFAnode n2 = n.addnode("E");
+        n1.Start = true;
+        n2.End = true;
+        n1.addEdge('\f',n2);
+        n1.addEdge('\n',n2);
+        n1.addEdge('\r',n2);
+        n1.addEdge('\t',n2);
+        n1.addEdge('\013',n2);
+
+        n.statesorted();
+        return n;
+    }
+
+    //为\w准备的
+    public static NFA insForw(){
+        NFA n = new NFA();
+        NFAnode n1 = n.addnode("S");
+        NFAnode n2 = n.addnode("E");
+        n1.Start = true;
+        n2.End = true;
+        for(int i=060;i<=071;i++){
+            n1.addEdge((char)i,n2);
+        }
+        for(int i=0101;i<=0132;i++){
+            n1.addEdge((char)i,n2);
+        }
+        for(int i=0141;i<=0172;i++){
+            n1.addEdge((char)i,n2);
+        }
+        n1.addEdge('_',n2);
+        n.statesorted();
+        return n;
+    }
+
     //添加闭包
     public void closure(){
         NFA n = new NFA();
@@ -207,13 +276,7 @@ public class NFA {
     }
 
 
-    public static void main(String[] args) {
-        char c = (char)2;
-        NFA n1 = NFA.ins(c);
-        NFAnode node = n1.getstart();
 
-        System.out.println(node.hasPath(c));
-    }
 
 
 }

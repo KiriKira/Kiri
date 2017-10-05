@@ -5,9 +5,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Transit {
-    public static String Alphabet = (char)10 + (char)13 + "  \"#$%&',-/0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~\01\02\03\04\05\06\0";
-    public static String alphabet1 = " !\"#$%&'+,-/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~?\01\02\03\04\05\06\0";
-    public static char[] alphabet2 = {' ','!','\"','#','$','%','&','\'','+',',','-','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','[',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','{','}','~','','?','\0',};
+    public static String Alphabet = (char)10 + (char)13 + "  \"#$.%&',-/0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~\01\02\03\04\05\06\0\07\010\011";
+    public static String alphabet1 = " !\"#$.%&'+,-/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~?\01\02\03\04\05\06\0\07\010\011\012\013\014\015\016\017\020\021";
+    public static char[] alphabet2 = {' ','.','!','\"','#','$','%','&','\'',',','-','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F',
+            'G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','[',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q',
+            'r','s','t','u','v','w','x','y','z','{','}','~','','?','\0','\01','\02','\03','\04','\05','\06','\07','\010','\011','\012','\013','\014','\015','\016','\017','\020','\021'};
 
     //将闭包转化为HashSet，以一个节点为起点
     public static HashSet<NFA.NFAnode> calClosure(NFA.NFAnode n){
