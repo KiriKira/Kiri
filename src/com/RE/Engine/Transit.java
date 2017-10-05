@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Transit {
-    public static String Alphabet = (char)10 + (char)13 + "  \"#$%&',-/0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~\01\02\03\04\05\06";
-    public static String alphabet1 = " !\"#$%&'+,-/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~?\01\02\03\04\05\06";
-    public static char[] alphabet2 = {' ','!','\"','#','$','%','&','\'','+',',','-','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','[',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','{','}','~','','?',};
+    public static String Alphabet = (char)10 + (char)13 + "  \"#$%&',-/0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~\01\02\03\04\05\06\0";
+    public static String alphabet1 = " !\"#$%&'+,-/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~?\01\02\03\04\05\06\0";
+    public static char[] alphabet2 = {' ','!','\"','#','$','%','&','\'','+',',','-','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','[',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','{','}','~','','?','\0',};
 
     //将闭包转化为HashSet，以一个节点为起点
     public static HashSet<NFA.NFAnode> calClosure(NFA.NFAnode n){
@@ -22,9 +22,11 @@ public class Transit {
                 break;
             for( int i=0;i<n1.edge.size();i++){
                 //确保不将已有的节点放入队列中
-                if(!dstates.contains(n1.desnodes.get(i))){
-                    queue.offer(n1.desnodes.get(i));
-                    dstates.add(n1.desnodes.get(i));
+                if(n1.edge.get(i).equals('\0')){
+                    if(!dstates.contains(n1.desnodes.get(i))){
+                        queue.offer(n1.desnodes.get(i));
+                        dstates.add(n1.desnodes.get(i));
+                    }
                 }
             }
         }
@@ -35,7 +37,8 @@ public class Transit {
     public static HashSet<NFA.NFAnode> calclosure(HashSet<NFA.NFAnode> T){
         HashSet<NFA.NFAnode> all = new HashSet<>();
         for(NFA.NFAnode node:T){
-            all.addAll(calClosure(node));
+            HashSet<NFA.NFAnode> r = calClosure(node);
+            all.addAll(r);
         }
         return all;
     }

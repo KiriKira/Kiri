@@ -94,8 +94,9 @@ public class DFA {
 
             while(!dStates.isEmpty()){
                 HashSet<NFAnode> currentNode = dStates.pop();
-                for(Character c:Transit.alphabet1.toCharArray()){
-                    HashSet<NFAnode> Temp = Transit.calclosure(Transit.nextClosure(currentNode,c));
+                for(Character c:Transit.alphabet2){
+                    HashSet<NFAnode> T1 = Transit.nextClosure(currentNode,c);
+                    HashSet<NFAnode> Temp = Transit.calclosure(T1);
                     if(!Transit.inResult(result,Temp)){
                         dStates.push(Temp);
                         dfa1.addNode(Temp);

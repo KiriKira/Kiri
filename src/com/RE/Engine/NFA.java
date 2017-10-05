@@ -72,7 +72,7 @@ public class NFA {
 
     private void addEnd(String s){
         if(nfa!=null)
-            getnode(s).End = false;
+            getnode(s).End = true;
     }
 
     private void addnode(NFAnode node){
@@ -128,10 +128,11 @@ public class NFA {
             nfa = n1.nfa;
             return;
         }
-        NFAnode n = getend();
-        n.End = false;
-        n1.getstart().Start = false;
-        n.addEdge('\0',n1.getstart());
+        NFAnode ne = getend();
+        ne.End = false;
+        NFAnode n1s = n1.getstart();
+        n1s.Start = false;
+        ne.addEdge('\0',n1s);
         for(NFAnode x : n1.nfa)
             this.addnode(x);
         this.statesorted();
