@@ -27,20 +27,33 @@ public class Re {
         return re;
     }
 
-    //完全是将[a-z]这种暴力替换，因此也不支持[1-9a-z]或[b-z]，请使用[1-9]\[a-z]这样
+    //完全是将[a-z]这种暴力替换，因此也支持[1-9a-z]，请使用[1-9]\[a-z]这样
     private String fakeMacro(String s) {
-        s = s.replace("[a-z]", "(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)");
-        s = s.replace("[0-9]", "(0|1|2|3|4|5|6|7|8|9)");
-        s = s.replace("[1-9]", "(1|2|3|4|5|6|7|8|9)");
-        s = s.replace("[A-Z]", "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)");
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i)=='['&&s.charAt(i+2)=='-'&&s.charAt(i+4)==']'){
+                StringBuffer sInstead = new StringBuffer();
+                sInstead.append('(');
+                for(int j=(int)s.charAt(i+1);j<=(int)s.charAt(i+3);j++){
+                    sInstead.append((char)j);
+                    sInstead.append('|');
+                }
+                sInstead.deleteCharAt(sInstead.length()-1);
+                sInstead.append(')');
+                String s1 =s.substring(0,i);
+                String s2 = sInstead.toString();
+                String s3 = s.substring(i+5);
+                s = s1 + s2 + s3;
+            }
+        }
         return s;
     }
 
+    //完成特殊字符的转义
     private String zhuanyi(String s) {
         for (int i=1;i < s.length(); i++) {
             if (s.charAt(i - 1) == '\\' && (s.charAt(i) == '.' || s.charAt(i) == '|' || s.charAt(i) == '\\'
                     || s.charAt(i) == '(' || s.charAt(i) == ')' || s.charAt(i) == '*'||s.charAt(i)=='+'
-                    ||s.charAt(i)=='s'||s.charAt(i)=='w')) {
+                    ||s.charAt(i)=='s'||s.charAt(i)=='w'||s.charAt(i)=='?')) {
                 String s1 = s.substring(0, i - 1);
                 String s2 = String.valueOf((char) zhuanyi.indexOf(s.charAt(i))); //转义后储存的是索引位置，而非SOH等的原意。
                 String s3 = s.substring(i + 1);
@@ -55,23 +68,24 @@ public class Re {
         StringBuffer sb = new StringBuffer();
         sb.append(re.charAt(0));
         for (int i = 1; i < re.length(); i++) {
-            if(isChar(re.charAt(i))&&(re.charAt(i-1)==')'||re.charAt(i-1)=='*'||re.charAt(i-1)=='+'||isChar(re.charAt(i-1)))
-                    ||(re.charAt(i)=='(')&&(isChar(re.charAt(i-1))||re.charAt(i-1)==')'||re.charAt(i-1)=='*'||re.charAt(i-1)=='+'))
+            if(isChar(re.charAt(i))&&(re.charAt(i-1)==')'||re.charAt(i-1)=='*'||re.charAt(i-1)=='+'||re.charAt(i-1)=='?'||isChar(re.charAt(i-1)))
+                    ||(re.charAt(i)=='(')&&(isChar(re.charAt(i-1))||re.charAt(i-1)==')'||re.charAt(i-1)=='*'||re.charAt(i-1)=='+'||re.charAt(i-1)=='?'))
                 sb.append('\016');//中缀式毗邻运算符
             sb.append(re.charAt(i));
         }
         return sb.toString();
     }
 
+    //将中缀式再转换为后缀式
     private String toPostfix(String expression){
         StringBuffer postfix = new StringBuffer();
         Stack<Character> operatestack = new Stack<Character>();
-        StringTokenizer tokens = new StringTokenizer(expression,"()*\016|+",true);
+        StringTokenizer tokens = new StringTokenizer(expression,"()*\016|+?",true);
         while(tokens.hasMoreTokens()){
             String token = tokens.nextToken();
             switch(token.charAt(0)){
                 case '|':
-                    while(!operatestack.isEmpty()&&(operatestack.peek()=='\016'||operatestack.peek()=='*'||operatestack.peek()=='+')){
+                    while(!operatestack.isEmpty()&&(operatestack.peek()=='\016'||operatestack.peek()=='*'||operatestack.peek()=='+'||operatestack.peek()=='?')){
                         postfix.append(operatestack.pop());
                     }
                     operatestack.push(token.charAt(0));
@@ -86,6 +100,9 @@ public class Re {
                     postfix.append(token.charAt(0));
                     break;
                 case '+':
+                    postfix.append(token.charAt(0));
+                    break;
+                case '?':
                     postfix.append(token.charAt(0));
                     break;
                 case '(':
@@ -123,6 +140,7 @@ public class Re {
         }
     }
 
+    //构造NFA
     private  NFA calExpression(String postfix){
         Stack<NFA> oprandstack = new Stack<NFA>();
         for(int i=0;i<postfix.length();i++){
@@ -130,6 +148,11 @@ public class Re {
             if(c == '*'){
                 NFA nfa = oprandstack.pop();
                 nfa.closure();
+                oprandstack.push(nfa);
+            }
+            else if(c=='?'){
+                NFA nfa = oprandstack.pop();
+                nfa.addedge(nfa.getstart().state,'\0',nfa.getend().state);
                 oprandstack.push(nfa);
             }
             else if(c == '+'){
@@ -168,7 +191,8 @@ public class Re {
     private void makeDFA(){
         String pre = preDeal();
         //System.out.println(pre);
-        //System.out.println(zhuanyi(pre));
+        //System.out.println(fakeMacro(re));
+        //System.out.println(zhuanyi(re));
         //System.out.println(addDot(zhuanyi(pre)));
         //System.out.println(toPostfix(addDot(zhuanyi(pre))));
         NFA nfa = this.calExpression(pre);
@@ -178,7 +202,7 @@ public class Re {
     public boolean match(String s){
         for(int i=0;i<s.length();i++){
             if(s.charAt(i)=='.'||s.charAt(i)=='|'||s.charAt(i)=='('||s.charAt(i)==')'
-                    ||s.charAt(i)=='*'||s.charAt(i)=='\\'||s.charAt(i)=='+')
+                    ||s.charAt(i)=='*'||s.charAt(i)=='\\'||s.charAt(i)=='+'||s.charAt(i)=='?')
             {
                 String s1 = s.substring(0,i);
                 String s2 = String.valueOf((char)zhuanyi.indexOf(s.charAt(i)));

@@ -140,7 +140,7 @@ public class DFA {
                 return false;
             DFAnode currentNode = null;
             for(DFAnode node:dfa)
-                if(node.start=true)
+                if(node.start==true)
                     currentNode = node;
 
             for(Character c:s.toCharArray()){
@@ -161,19 +161,17 @@ public class DFA {
 
         //逐个匹配，操作count给下一个真正的search函数，找不到就返回false
         public boolean search(String s,int[] count){
-            int index=0;
             if(dfa==null)
                 return false;
             DFAnode currentNode = null;
             for(DFAnode node:dfa)
-                if(node.start=true)
+                if(node.start==true)
                     currentNode = node;
 
             for(Character c:s.toCharArray()){
-                index++;
                 if(currentNode.haspath(c)){
                     currentNode = currentNode.desnode.get(currentNode.edge.indexOf(c));
-                    if(currentNode.end=true)
+                    if(currentNode.end==true)
                         return true;//非贪婪匹配
                 }
                 else{

@@ -104,7 +104,7 @@ public class NFA  {
             return n1;
     }
 
-    private void addedge(String src,Character c,String des){
+    public void addedge(String src,Character c,String des){
         NFAnode from = getnode(src);
         NFAnode to = getnode(des);
         from.addEdge(c,to);
