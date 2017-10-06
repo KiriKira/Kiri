@@ -1,20 +1,48 @@
 package com.RE.Engine;
 
+import java.util.HashMap;
 import java.util.Stack;
 import java.util.StringTokenizer;
-import com.RE.Engine.DFA;
-import com.RE.Engine.NFA;
-import com.RE.Engine.Transit;
 
 public class Re {
     private String re;
     private DFA dfa;
     private String zhuanyi = "A.*|()\\+AAAAAAA?sw";//A是为了让后面符号的索引从1开始而加的.？是第15位。
+    private HashMap<String,String> macroMap = new HashMap<>(); //宏定义表
 
     public Re(String s) {
         re = s;
         makeDFA();
     }
+
+    public Re(String s,String... macroset){
+        re = s ;
+        for(int i=0;i<macroset.length;i++){
+            String[] temp = macroset[i].split(":");
+            macroMap.put(temp[0].trim(),temp[1].trim());
+        }
+        makeDFA();
+    }
+
+    private int countAppear(String s,Character c){
+        int count = 0;
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i)==c)
+                count++;
+        }
+        return count;
+    }
+
+    private int lastnChar(String s,Character c,int n ){
+        int index = s.lastIndexOf(c);
+        if(n==1)
+            return index;
+        for(int i=0;i<n-1;i++){
+            index = s.lastIndexOf(c,index-1);
+        }
+        return index;
+    }
+
 
     private boolean isChar(char c) {
         for (int i = 0; i < Transit.alphabet2.length; i++)
@@ -47,6 +75,65 @@ public class Re {
         }
         return s;
     }
+
+    private String macroReplace(String s){
+        if(macroMap.isEmpty())
+            return s;
+        for(HashMap.Entry<String,String> entry: macroMap.entrySet()){
+            s = s.replace("{"+entry.getKey()+"}","("+entry.getValue()+")");
+        }
+        return s;
+
+    }
+
+    //尝试处理{n}
+    private String candy(String s){
+
+        while(true){
+            int i1 = s.indexOf('{');
+            if( i1 ==-1)
+                break;
+            int i2 = s.indexOf('}',i1);
+            if(i2 == -1)
+                break;
+            String s1 = s.substring(i1+1,i2);
+            for(Character c:s1.toCharArray()){
+                if('0'<=c&&c<='9')
+                    continue;
+                else
+                    return s;
+            }
+            int n = Integer.parseInt(s1);
+            if(s.charAt(i1-1)!=')'){
+                String t1 = s.substring(0,i1-1);
+                StringBuffer t2 = new StringBuffer();
+                for(int i=0;i<n;i++){
+                    Character c = s.charAt(i1-1);
+                    t2.append(c);
+                }
+                String t3 = t2.toString();
+                String t4 = s.substring(i2+1);
+                s = t1 + t3 + t4;
+            }
+            else {
+                int l1 = s.lastIndexOf('(',i1-1);
+                int n2 = countAppear(s.substring(l1+1,i1),')');
+                int l2 = lastnChar(s.substring(0,i1),'(',n2);
+                String temp = s.substring(l2,i1);
+                String t1 = s.substring(0,l2);
+                StringBuffer t2 = new StringBuffer();
+                for(int j=0;j<n;j++)
+                    t2.append(temp);
+                String t3 = t2.toString();
+                String t4 = s.substring(i2+1);
+                s = t1 + t3 +t4;
+
+            }
+
+        }
+        return s;
+    }
+
 
     //完成特殊字符的转义
     private String zhuanyi(String s) {
@@ -171,10 +258,10 @@ public class Re {
             else if(c == '.'){
                 oprandstack.push(NFA.insAny());
             }
-            else if(c == '\021'){
+            else if(c == '\020'){
                 oprandstack.push(NFA.insFors());
             }
-            else if(c == '\022'){
+            else if(c == '\021'){
                 oprandstack.push(NFA.insForw());
             }
             else {
@@ -185,7 +272,7 @@ public class Re {
     }
 
     private String preDeal(){
-        return toPostfix(addDot(zhuanyi(fakeMacro(re))));
+        return toPostfix(addDot(candy(zhuanyi(fakeMacro(macroReplace(re))))));
     }
 
     private void makeDFA(){
