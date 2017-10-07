@@ -87,22 +87,28 @@ public class Re {
     }
 
     //尝试处理{n}
-    private String candy(String s){
-
+    private String candy1(String s){
+        int count=0;
         while(true){
-            int i1 = s.indexOf('{');
+            int i1 = s.indexOf('{',count);
+            count = i1+1;
             if( i1 ==-1)
                 break;
             int i2 = s.indexOf('}',i1);
             if(i2 == -1)
                 break;
             String s1 = s.substring(i1+1,i2);
+            boolean flag = true;
             for(Character c:s1.toCharArray()){
                 if('0'<=c&&c<='9')
                     continue;
-                else
-                    return s;
+                else {
+                    flag = false;
+                    break;
+                }
             }
+            if(flag==false)
+                continue;
             int n = Integer.parseInt(s1);
             if(s.charAt(i1-1)!=')'){
                 String t1 = s.substring(0,i1-1);
@@ -129,6 +135,40 @@ public class Re {
                 s = t1 + t3 +t4;
 
             }
+
+        }
+        return s;
+    }
+
+    //处理{n,}
+    private String candy2(String s){
+        int count=0;
+        while(true){
+            int i1 = s.indexOf('{',count);
+            count = i1+1;
+            if( i1 ==-1)
+                break;
+            int i2 = s.indexOf('}',i1);
+            if(i2 == -1)
+                break;
+            if(s.charAt(i2-1)!=',')
+                continue;
+            String s1 = s.substring(i1+1,i2-1);
+            boolean flag = true;
+            for(Character c:s1.toCharArray()){
+                if('0'<=c&&c<='9')
+                    continue;
+                else{
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag == false)
+                continue;
+            String t1 = s.substring(0,i2-1);
+            String t2 = "}+";
+            String t3 = s.substring(i2+1);
+            s = t1 + t2 +t3;
 
         }
         return s;
@@ -272,12 +312,12 @@ public class Re {
     }
 
     private String preDeal(){
-        return toPostfix(addDot(candy(zhuanyi(fakeMacro(macroReplace(re))))));
+        return toPostfix(addDot(candy1(candy2(zhuanyi(fakeMacro(macroReplace(re)))))));
     }
 
     private void makeDFA(){
         String pre = preDeal();
-        //System.out.println(pre);
+        System.out.println(pre);
         //System.out.println(fakeMacro(re));
         //System.out.println(zhuanyi(re));
         //System.out.println(addDot(zhuanyi(pre)));
