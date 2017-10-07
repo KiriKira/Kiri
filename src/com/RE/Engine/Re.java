@@ -24,6 +24,7 @@ public class Re {
         makeDFA();
     }
 
+    //废案
     private int countAppear(String s,Character c){
         int count = 0;
         for(int i=0;i<s.length();i++){
@@ -33,6 +34,7 @@ public class Re {
         return count;
     }
 
+    //废案
     private int lastnChar(String s,Character c,int n ){
         int index = s.lastIndexOf(c);
         if(n==1)
@@ -41,6 +43,21 @@ public class Re {
             index = s.lastIndexOf(c,index-1);
         }
         return index;
+    }
+
+    private int findLeft(String s){
+        if(s.charAt(s.length()-1)!=')')
+            return -1;
+        int count = 0;
+        for(int i=s.length()-1;i>=0;i--){
+            if(s.charAt(i)==')')
+                count++;
+            if(s.charAt(i)=='(')
+                count--;
+            if(count==0)
+                return i;
+        }
+        return -1;
     }
 
 
@@ -121,10 +138,8 @@ public class Re {
                 String t4 = s.substring(i2+1);
                 s = t1 + t3 + t4;
             }
-            else {
-                int l1 = s.lastIndexOf('(',i1-1);
-                int n2 = countAppear(s.substring(l1+1,i1),')');
-                int l2 = lastnChar(s.substring(0,i1),'(',n2);
+            else {//遇到嵌套里面的串联嵌套就错了
+                int l2 = findLeft(s.substring(0,i1));
                 String temp = s.substring(l2,i1);
                 String t1 = s.substring(0,l2);
                 StringBuffer t2 = new StringBuffer();
@@ -317,11 +332,7 @@ public class Re {
 
     private void makeDFA(){
         String pre = preDeal();
-        System.out.println(pre);
-        //System.out.println(fakeMacro(re));
-        //System.out.println(zhuanyi(re));
-        //System.out.println(addDot(zhuanyi(pre)));
-        //System.out.println(toPostfix(addDot(zhuanyi(pre))));
+        //System.out.println(pre);
         NFA nfa = this.calExpression(pre);
         this.dfa = new DFA(nfa);
     }
