@@ -45,6 +45,7 @@ public class Re {
         return index;
     }
 
+    //找到右括号对应的左括号
     private int findLeft(String s){
         if(s.charAt(s.length()-1)!=')')
             return -1;
@@ -60,7 +61,7 @@ public class Re {
         return -1;
     }
 
-
+    //为了把操作符和普通字符隔离开来
     private boolean isChar(char c) {
         for (int i = 0; i < Transit.alphabet2.length; i++)
             if (Transit.alphabet2[i] == c)
@@ -72,7 +73,7 @@ public class Re {
         return re;
     }
 
-    //完全是将[a-z]这种暴力替换，因此也支持[1-9a-z]，请使用[1-9]\[a-z]这样
+    //处理[a-z],[0-9]，不过不支持[a-z1-9]
     private String fakeMacro(String s) {
         for(int i=0;i<s.length();i++){
             if(s.charAt(i)=='['&&s.charAt(i+2)=='-'&&s.charAt(i+4)==']'){
@@ -93,6 +94,7 @@ public class Re {
         return s;
     }
 
+    //宏替换方法
     private String macroReplace(String s){
         if(macroMap.isEmpty())
             return s;
